@@ -1,0 +1,61 @@
+﻿using System.Windows.Forms;
+using System.Xml.Linq;
+
+namespace coursework
+{
+    public partial class Form1 : Form
+    {
+        public string PersonNameValue { get; set; }
+        public string TelephoneValue { get; set; }
+        public string EmailValue { get; set; }
+        public string RoleValue { get; set; }
+        public string AdditionalInfoValue { get; set; }
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+
+        private void AddNew_Click(object sender, EventArgs e)
+        {
+            AddPersonForm form = new AddPersonForm();
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                dataGridView1.Rows.Add(
+                    form.PersonNameValue,
+                    form.TelephoneValue,
+                    form.EmailValue,
+                    form.RoleValue,
+                    form.AdditionalInfoValue
+                );
+            }
+        }
+
+        private void btnEdit_Click(object sender, EventArgs e)
+        {
+            if (dataGridView1.CurrentRow == null) return;
+            
+            DataGridViewRow row = dataGridView1.CurrentRow;
+
+            EditPersonForm form = new EditPersonForm();
+            form.PersonNameValue = row.Cells[0].Value?.ToString();
+            form.TelephoneValue = row.Cells[1].Value?.ToString();
+            form.EmailValue = row.Cells[2].Value?.ToString();
+            form.RoleValue = row.Cells[3].Value?.ToString();
+            form.AdditionalInfoValue = row.Cells[4].Value?.ToString();
+
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                row.Cells[0].Value = form.PersonNameValue;
+                row.Cells[1].Value = form.TelephoneValue;
+                row.Cells[2].Value = form.EmailValue;
+                row.Cells[3].Value = form.RoleValue;
+                row.Cells[4].Value = form.AdditionalInfoValue;
+            }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+        }
+    }
+}

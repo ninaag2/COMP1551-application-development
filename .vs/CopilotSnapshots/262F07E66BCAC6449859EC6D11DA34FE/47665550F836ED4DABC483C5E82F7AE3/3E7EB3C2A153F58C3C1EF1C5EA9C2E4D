@@ -1,0 +1,58 @@
+﻿using System.Windows.Forms;
+using System.Xml.Linq;
+
+namespace coursework
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void btnAddNew_Click(object sender, EventArgs e)
+        {
+            AddPersonForm form = new AddPersonForm();
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                var data = form.GetInputData();
+                dataGridView1.Rows.Add(
+                    data.Name,
+                    data.Tel,
+                    data.Email,
+                    data.Role,
+                    data.Info
+                );
+            }
+        }
+
+        private void btnEdit_Click(object sender, EventArgs e)
+        {
+            if (dataGridView1.CurrentRow == null) return;
+            
+            DataGridViewRow row = dataGridView1.CurrentRow;
+
+            string name = row.Cells[0].Value?.ToString() ?? "";
+            string tel = row.Cells[1].Value?.ToString() ?? "";
+            string email = row.Cells[2].Value?.ToString() ?? "";
+            string role = row.Cells[3].Value?.ToString() ?? "";
+            string info = row.Cells[4].Value?.ToString() ?? "";
+
+            EditPersonForm form = new EditPersonForm(name, tel, email, role, info);
+
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                var newData = form.GetInputData();
+                row.Cells[0].Value = newData.Name;
+                row.Cells[1].Value = newData.Tel;
+                row.Cells[2].Value = newData.Email;
+                row.Cells[3].Value = newData.Role;
+                row.Cells[4].Value = newData.Info;
+            }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+        }
+    }
+}

@@ -1,0 +1,207 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
+
+namespace coursework
+{
+    public partial class AddPersonForm : Form
+    {
+        public AddPersonForm()
+        {
+            InitializeComponent();
+            button2.Click += button2_Click;
+            button1.Click += button1_Click;
+
+            // Khởi tạo các sự lựa chọn cho Combobox Role
+            comboBox1.Items.Clear();
+            comboBox1.Items.Add("Teaching Staff");
+            comboBox1.Items.Add("Administration");
+            comboBox1.Items.Add("Students");
+            comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
+            
+            comboBox1.SelectedIndexChanged += ComboBox1_SelectedIndexChanged;
+        }
+
+        private void ComboBox1_SelectedIndexChanged(object? sender, EventArgs e)
+        {
+            string role = comboBox1.Text;
+            if (role == "Teaching Staff")
+            {
+                label5.Visible = true;
+                textBox4.Visible = true;
+                label6.Visible = true;
+                textBox5.Visible = true;
+                label6.Text = "Subjects (2):";
+            }
+            else if (role == "Administration")
+            {
+                label5.Visible = true;
+                textBox4.Visible = true;
+                label6.Visible = true;
+                textBox5.Visible = true;
+                label6.Text = "Status, Hours:";
+            }
+            else if (role == "Students")
+            {
+                label5.Visible = false;
+                textBox4.Visible = false;
+                textBox4.Text = ""; // Clear salary for student
+                
+                label6.Visible = true;
+                textBox5.Visible = true;
+                label6.Text = "Subjects (3):";
+            }
+        }
+
+        public (string Name, string Tel, string Email, string Role, string Info) GetInputData()
+        {
+            string info = (comboBox1.Text == "Students" || comboBox1.Text == "Student") ? 
+                          textBox5.Text : 
+                          textBox4.Text + " " + textBox5.Text;
+
+            return (
+                textBox1.Text,
+                textBox2.Text,
+                textBox3.Text,
+                comboBox1.Text,
+                info
+            );
+        }
+
+        private void button2_Click(object? sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(textBox1.Text))
+            {
+                MessageBox.Show("Name cannot be empty!", "Validation Error");
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(textBox2.Text))
+            {
+                MessageBox.Show("Telephone cannot be empty!", "Validation Error");
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(textBox3.Text))
+            {
+                MessageBox.Show("Email cannot be empty!", "Validation Error");
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(comboBox1.Text))
+            {
+                MessageBox.Show("Role cannot be empty!", "Validation Error");
+                return;
+            }
+            if (comboBox1.Text != "Students" && comboBox1.Text != "Student")
+            {
+                if (string.IsNullOrWhiteSpace(textBox4.Text))
+                {
+                    MessageBox.Show("Salary cannot be empty!", "Validation Error");
+                    return;
+                }
+            }
+            if (string.IsNullOrWhiteSpace(textBox5.Text))
+            {
+                MessageBox.Show("Subjects cannot be empty!", "Validation Error");
+                return;
+            }
+
+            // Kiểm tra Name không chứa số
+            if (System.Text.RegularExpressions.Regex.IsMatch(textBox1.Text, @"\d"))
+            {
+                MessageBox.Show("Name must not contain numbers!", "Validation Error");
+                return;
+            }
+
+            // Kiểm tra số điện thoại chỉ chứa số
+            if (!System.Text.RegularExpressions.Regex.IsMatch(textBox2.Text, @"^\d+$"))
+            {
+                MessageBox.Show("Telephone must contain numbers only!", "Validation Error");
+                return;
+            }
+
+            // Kiểm tra độ dài số điện thoại không quá 11 số
+            if (textBox2.Text.Length > 11)
+            {
+                MessageBox.Show("Telephone must not exceed 11 digits!", "Validation Error");
+                return;
+            }
+
+            // Kiểm tra Email phải chứa @gmail.com
+            if (!textBox3.Text.EndsWith("@gmail.com"))
+            {
+                MessageBox.Show("Email must end with @gmail.com!", "Validation Error");
+                return;
+            }
+
+            // Kiểm tra trường Salary (nếu role không phải student thì thông tin chia ra có lương) - ta kiểm tra ô đầu tiên của thông tin là số
+            if (comboBox1.Text == "Teaching Staff" || comboBox1.Text == "Administration" || comboBox1.Text == "Teacher" || comboBox1.Text == "Admin")
+            {
+                if (!double.TryParse(textBox4.Text, out _))
+                {
+                    MessageBox.Show("Salary must be a number!", "Validation Error");
+                    return;
+                }
+            }
+
+            // Kiểm tra: nếu Administration phải nhập FullTime/PartTime và Working Hours
+            if (comboBox1.Text == "Administration" || comboBox1.Text == "Admin")
+            {
+                string[] adminInfo = textBox5.Text.Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
+                if (adminInfo.Length < 2)
+                {
+                    MessageBox.Show("Administration must provide Status (Full-time/Part-time) and Working Hours!", "Validation Error");
+                    return;
+                }
+                
+                string textLower = textBox5.Text.ToLower();
+                if (!textLower.Contains("true") && !textLower.Contains("false") && 
+                    !textLower.Contains("full-time") && !textLower.Contains("part-time") && 
+                    !textLower.Contains("fulltime") && !textLower.Contains("parttime") &&
+                    !textLower.Contains("full time") && !textLower.Contains("part time"))
+                {
+                    MessageBox.Show("Status must contain 'Full-Time' or 'Part-Time'!", "Validation Error");
+                    return;
+                }
+
+                bool hasHours = false;
+                foreach (var info in adminInfo)
+                {
+                    if (int.TryParse(info, out _))
+                    {
+                        hasHours = true;
+                        break;
+                    }
+                }
+
+                if (!hasHours)
+                {
+                    MessageBox.Show("Working hours must be a valid integer number!", "Validation Error");
+                    return;
+                }
+            }
+            
+            // Kiểm tra: nếu là Students thì phải nhập đủ 3 môn học
+            if (comboBox1.Text == "Students" || comboBox1.Text == "Student")
+            {
+                string[] subjects = textBox5.Text.Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
+                if (subjects.Length != 3)
+                {
+                    MessageBox.Show("Students must have exactly 3 subjects (separated by space/comma)!", "Validation Error");
+                    return;
+                }
+            }
+
+            this.DialogResult = DialogResult.OK;
+            this.Close();
+        }
+
+        private void button1_Click(object? sender, EventArgs e)
+        {
+            this.DialogResult = DialogResult.Cancel;
+            this.Close();
+        }
+    }
+}

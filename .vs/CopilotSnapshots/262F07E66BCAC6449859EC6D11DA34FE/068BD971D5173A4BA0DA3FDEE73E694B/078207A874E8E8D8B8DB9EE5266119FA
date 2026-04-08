@@ -1,0 +1,67 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
+
+namespace coursework
+{
+    public partial class AddPersonForm : Form
+    {
+        public AddPersonForm()
+        {
+            InitializeComponent();
+            button2.Click += button2_Click;
+
+            // Khởi tạo các sự lựa chọn cho Combobox Role
+            comboBox1.Items.Clear();
+            comboBox1.Items.Add("Teacher");
+            comboBox1.Items.Add("Admin");
+            comboBox1.Items.Add("Student");
+            comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
+        }
+
+        public (string Name, string Tel, string Email, string Role, string Info) GetInputData()
+        {
+            return (
+                textBox1.Text,
+                textBox2.Text,
+                textBox3.Text,
+                comboBox1.Text,
+                textBox4.Text + " " + textBox5.Text
+            );
+        }
+
+        private void button2_Click(object? sender, EventArgs e)
+        {
+            // Kiểm tra số điện thoại chỉ chứa số
+            if (!System.Text.RegularExpressions.Regex.IsMatch(textBox2.Text, @"^\d+$"))
+            {
+                MessageBox.Show("Telephone must contain numbers only!", "Validation Error");
+                return;
+            }
+
+            // Kiểm tra Email phải chứa @gmail.com
+            if (!textBox3.Text.EndsWith("@gmail.com"))
+            {
+                MessageBox.Show("Email must end with @gmail.com!", "Validation Error");
+                return;
+            }
+
+            // Kiểm tra trường Salary (nếu role không phải student thì thông tin chia ra có lương) - ta kiểm tra ô đầu tiên của thông tin là số
+            if (comboBox1.Text == "Teacher" || comboBox1.Text == "Admin")
+            {
+                if (!double.TryParse(textBox4.Text, out _))
+                {
+                    MessageBox.Show("Salary must be a number!", "Validation Error");
+                    return;
+                }
+            }
+
+            this.DialogResult = DialogResult.OK;
+            this.Close();
+        }
+    }
+}

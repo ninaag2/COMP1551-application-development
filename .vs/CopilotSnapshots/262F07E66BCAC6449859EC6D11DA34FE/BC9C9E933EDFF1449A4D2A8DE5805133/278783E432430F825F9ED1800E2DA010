@@ -1,0 +1,49 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace codework
+{
+    public abstract class Person
+    {
+        public string Name { get; set; }
+        public string Telephone { get; set; }
+        public string Email { get; set; }
+        public string Role { get; set; } // Teacher, Admin, hoặc Student [5]
+
+        public Person(string name, string tel, string email, string role)
+        {
+            Name = name; Telephone = tel; Email = email; Role = role;
+        }
+
+        public virtual string GetDetails() => $"Name: {Name}, Role: {Role}";
+    }
+
+    // Các lớp con kế thừa (Inheritance) [4]
+    public class Teacher : Person
+    {
+        public double Salary { get; set; } // Lương [5]
+        public string Subject1 { get; set; } // Tên 2 môn học [6]
+        public string Subject2 { get; set; }
+        public Teacher(string n, string t, string e, double s, string s1, string s2)
+            : base(n, t, e, "Teacher") { Salary = s; Subject1 = s1; Subject2 = s2; }
+    }
+
+    public class Admin : Person
+    {
+        public double Salary { get; set; } // Lương [6]
+        public bool IsFullTime { get; set; } // Full-time/Part-time [6]
+        public int WorkingHours { get; set; } // Giờ làm việc [6]
+        public Admin(string n, string t, string e, double s, bool ft, int h)
+            : base(n, t, e, "Admin") { Salary = s; IsFullTime = ft; WorkingHours = h; }
+    }
+
+    public class Student : Person
+    {
+        public string Subject1 { get; set; } // Tên 3 môn học [6]
+        public string Subject2 { get; set; }
+        public string Subject3 { get; set; }
+        public Student(string n, string t, string e, string s1, string s2, string s3)
+            : base(n, t, e, "Student") { Subject1 = s1; Subject2 = s2; Subject3 = s3; }
+    }
+}

@@ -1,0 +1,18 @@
+﻿namespace coursework
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+            AddNew.Click += AddNew_Click;
+        }
+
+
+        private void AddNew_Click(object sender, EventArgs e)
+        {
+            AddPersonForm form = new AddPersonForm();
+            form.ShowDialog();
+        }
+    }
+}

@@ -1,0 +1,75 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
+using System.Xml.Linq;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
+
+namespace coursework
+{
+    public partial class EditPersonForm : Form
+    {
+        public EditPersonForm()
+        {
+            InitializeComponent();
+            
+            // Khởi tạo các sự lựa chọn cho Combobox Role
+            comboRole.Items.Clear();
+            comboRole.Items.Add("Teacher");
+            comboRole.Items.Add("Admin");
+            comboRole.Items.Add("Student");
+            comboRole.DropDownStyle = ComboBoxStyle.DropDownList;
+        }
+
+        public EditPersonForm(string name, string tel, string email, string role, string info) : this()
+        {
+            txtName.Text = name;
+            txtTelephone.Text = tel;
+            txtEmail.Text = email;
+            comboRole.Text = role;
+            txtAdditional.Text = info;
+        }
+
+        public (string Name, string Tel, string Email, string Role, string Info) GetInputData()
+        {
+            return (
+                txtName.Text,
+                txtTelephone.Text,
+                txtEmail.Text,
+                comboRole.Text,
+                txtAdditional.Text
+            );
+        }
+
+        private void EditPersonForm_Load(object sender, EventArgs e)
+        {
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            // Kiểm tra số điện thoại chỉ chứa số
+            if (!System.Text.RegularExpressions.Regex.IsMatch(txtTelephone.Text, @"^\d+$"))
+            {
+                MessageBox.Show("Telephone must contain numbers only!", "Validation Error");
+                return;
+            }
+
+            // Kiểm tra Email phải chứa @gmail.com
+            if (!txtEmail.Text.EndsWith("@gmail.com"))
+            {
+                MessageBox.Show("Email must end with @gmail.com!", "Validation Error");
+                return;
+            }
+
+            // Lấy salary ra từ txtAdditional (Vì form Edit gộp chung, ta sẽ tách phần số đầu tiên)
+            // Trong thực tế design của bạn sẽ cần làm TextBox riêng cho lương để dễ sửa
+            // Ở đây tạm bỏ qua vì Edit gom chung vào 1 textbox. Nhưng vẫn cản nếu không đúng định dạng.
+
+            this.DialogResult = DialogResult.OK;
+            this.Close();
+        }
+    }
+}

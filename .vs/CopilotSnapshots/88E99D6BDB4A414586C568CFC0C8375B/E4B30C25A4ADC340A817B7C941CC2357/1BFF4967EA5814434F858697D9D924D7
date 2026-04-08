@@ -1,0 +1,130 @@
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MySql.Data.MySqlClient;
+
+namespace coursework.Tests
+{
+    [TestClass]
+    public class DatabaseTests
+    {
+        // Chuỗi kết nối Database (giống hệt trong Form1)
+        private string connectionString = "server=localhost;port=3306;user=root;password=1234;database=new_schema;";
+
+        [TestMethod]
+        public void Test_Insert_And_Verify_Database()
+        {
+            // --- ARRANGE: Chuẩn bị dữ liệu ---
+            string testName = "TestUser_Add_" + Guid.NewGuid().ToString().Substring(0, 5); // Tên ngẫu nhiên để tránh trùng lặp
+            string testPhone = "0123456789";
+            string testEmail = "test@example.com";
+            string testRole = "Student";
+            double testSalary = 0;
+            string testInfo = "S1, S2, S3";
+            long insertedId = 0;
+
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+
+                // --- ACT 1: Test Insert (Add) ---
+                string insertQuery = "INSERT INTO Person (name, phone, email, role, salary, info) VALUES (@n, @p, @e, @r, @s, @i)";
+                using (MySqlCommand cmd = new MySqlCommand(insertQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@n", testName);
+                    cmd.Parameters.AddWithValue("@p", testPhone);
+                    cmd.Parameters.AddWithValue("@e", testEmail);
+                    cmd.Parameters.AddWithValue("@r", testRole);
+                    cmd.Parameters.AddWithValue("@s", testSalary);
+                    cmd.Parameters.AddWithValue("@i", testInfo);
+
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    Assert.AreEqual(1, rowsAffected, "Cần 1 dòng được thêm vào DB"); // Kiểm tra có Insert thành công không
+
+                    // Lấy ID vừa được tạo tự động
+                    insertedId = cmd.LastInsertedId;
+                }
+
+                // --- ASSERT 1: Lấy lên thử để kiểm tra ---
+                string selectQuery = "SELECT name, email FROM Person WHERE id = @id";
+                using (MySqlCommand cmd = new MySqlCommand(selectQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", insertedId);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        Assert.IsTrue(reader.Read(), "Phải đọc được dữ liệu vừa lưu");
+                        Assert.AreEqual(testName, reader["name"].ToString());
+                        Assert.AreEqual(testEmail, reader["email"].ToString());
+                    }
+                }
+
+                // --- CLEAN UP: Đoạn test tự dọn dẹp để không làm rác Database ---
+                string deleteQuery = "DELETE FROM Person WHERE id = @id";
+                using (MySqlCommand cmd = new MySqlCommand(deleteQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", insertedId);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        [TestMethod]
+        public void Test_Update_Database()
+        {
+            
+            string initialName = "TestUser_Edit";
+            long insertedId = 0;
+
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+
+                string insertQuery = "INSERT INTO Person (name, phone, email, role, salary, info) VALUES (@n, '', '', 'Admin', 0, '')";
+                using (MySqlCommand cmd = new MySqlCommand(insertQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@n", initialName);
+                    cmd.ExecuteNonQuery();
+                    insertedId = cmd.LastInsertedId;
+                }
+
+                //ACT: Update (Edit) Person này (Giống hàm UpdateDatabase trong Form1) ---
+                string updatedName = "TestUser_Edit_Success";
+                string updatedPhone = "999999999";
+                string updatedEmail = "edit@example.com";
+                
+                string updateQuery = "UPDATE Person SET name=@n, phone=@p, email=@e WHERE id=@id";
+                using (MySqlCommand cmd = new MySqlCommand(updateQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@n", updatedName);
+                    cmd.Parameters.AddWithValue("@p", updatedPhone);
+                    cmd.Parameters.AddWithValue("@e", updatedEmail);
+                    cmd.Parameters.AddWithValue("@id", insertedId);
+                    
+                    int rowsUpdated = cmd.ExecuteNonQuery();
+                    Assert.AreEqual(1, rowsUpdated, "Cần 1 dòng được cập nhật");
+                }
+
+               
+                string selectQuery = "SELECT name, phone, email FROM Person WHERE id = @id";
+                using (MySqlCommand cmd = new MySqlCommand(selectQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", insertedId);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        Assert.IsTrue(reader.Read());
+                        Assert.AreEqual(updatedName, reader["name"].ToString());
+                        Assert.AreEqual(updatedPhone, reader["phone"].ToString());
+                        Assert.AreEqual(updatedEmail, reader["email"].ToString());
+                    }
+                }
+
+                // --- CLEAN UP: ---
+                string deleteQuery = "DELETE FROM Person WHERE id = @id";
+                using (MySqlCommand cmd = new MySqlCommand(deleteQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", insertedId);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+    }
+}

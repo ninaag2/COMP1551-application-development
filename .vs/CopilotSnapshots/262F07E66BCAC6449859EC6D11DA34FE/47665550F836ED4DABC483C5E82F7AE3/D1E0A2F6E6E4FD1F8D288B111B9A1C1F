@@ -1,0 +1,96 @@
+﻿using System;
+using System.Windows.Forms;
+using MySql.Data.MySqlClient;
+
+namespace coursework
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void btnAddNew_Click(object sender, EventArgs e)
+        {
+            AddPersonForm form = new AddPersonForm();
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                var data = form.GetInputData();
+                
+                // Add to UI Grid
+                dataGridView1.Rows.Add(
+                    data.Name,
+                    data.Tel,
+                    data.Email,
+                    data.Role,
+                    data.Info
+                );
+
+                // Save to MySQL DB
+                SaveToMySQL(data.Name, data.Tel, data.Email, data.Role, data.Info);
+            }
+        }
+
+        private void SaveToMySQL(string name, string tel, string email, string role, string info)
+        {
+            // Thay đổi bằng thông tin MySQL Server của bạn!
+            string connectionString = "Server=localhost;Port=3306;Database=coursework;Uid=root;Pwd=;";
+            
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+                    // Giả định bạn có bảng tên `Persons` gồm các cột (Name, Telephone, Email, Role, AdditionalInfo)
+                    string query = "INSERT INTO Persons (Name, Telephone, Email, Role, AdditionalInfo) VALUES (@name, @tel, @email, @role, @info)";
+                    
+                    using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@name", name);
+                        cmd.Parameters.AddWithValue("@tel", tel);
+                        cmd.Parameters.AddWithValue("@email", email);
+                        cmd.Parameters.AddWithValue("@role", role);
+                        cmd.Parameters.AddWithValue("@info", info);
+                        
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                MessageBox.Show("Đã lưu vào MySQL thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi lưu vào DB: \n(Hãy đảm bảo bạn đã tạo Database và Table trên MySQL Server nhé!)\n" + ex.Message, "Lỗi MySQL", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnEdit_Click(object sender, EventArgs e)
+        {
+            if (dataGridView1.CurrentRow == null) return;
+            
+            DataGridViewRow row = dataGridView1.CurrentRow;
+
+            string name = row.Cells[0].Value?.ToString() ?? "";
+            string tel = row.Cells[1].Value?.ToString() ?? "";
+            string email = row.Cells[2].Value?.ToString() ?? "";
+            string role = row.Cells[3].Value?.ToString() ?? "";
+            string info = row.Cells[4].Value?.ToString() ?? "";
+
+            EditPersonForm form = new EditPersonForm(name, tel, email, role, info);
+
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                var newData = form.GetInputData();
+                row.Cells[0].Value = newData.Name;
+                row.Cells[1].Value = newData.Tel;
+                row.Cells[2].Value = newData.Email;
+                row.Cells[3].Value = newData.Role;
+                row.Cells[4].Value = newData.Info;
+            }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+        }
+    }
+}

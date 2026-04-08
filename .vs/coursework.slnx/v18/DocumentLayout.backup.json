@@ -1,0 +1,75 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\LENOVO\\Downloads\\application development\\week1\\coursework\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{FCA017E7-32D4-74D6-F6DD-744BE2D5524F}|coursework\\coursework.csproj|c:\\users\\lenovo\\downloads\\application development\\week1\\coursework\\coursework\\persontests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FCA017E7-32D4-74D6-F6DD-744BE2D5524F}|coursework\\coursework.csproj|solutionrelative:coursework\\persontests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FCA017E7-32D4-74D6-F6DD-744BE2D5524F}|coursework\\coursework.csproj|c:\\users\\lenovo\\downloads\\application development\\week1\\coursework\\coursework\\addpersonform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FCA017E7-32D4-74D6-F6DD-744BE2D5524F}|coursework\\coursework.csproj|solutionrelative:coursework\\addpersonform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FCA017E7-32D4-74D6-F6DD-744BE2D5524F}|coursework\\coursework.csproj|c:\\users\\lenovo\\downloads\\application development\\week1\\coursework\\coursework\\coursework.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{FCA017E7-32D4-74D6-F6DD-744BE2D5524F}|coursework\\coursework.csproj|solutionrelative:coursework\\coursework.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "AddPersonForm.cs",
+              "DocumentMoniker": "C:\\Users\\LENOVO\\Downloads\\application development\\week1\\coursework\\coursework\\AddPersonForm.cs",
+              "RelativeDocumentMoniker": "coursework\\AddPersonForm.cs",
+              "ToolTip": "C:\\Users\\LENOVO\\Downloads\\application development\\week1\\coursework\\coursework\\AddPersonForm.cs",
+              "RelativeToolTip": "coursework\\AddPersonForm.cs",
+              "ViewState": "AgIAAMgAAAAAAAAAAAAxwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-07T14:49:08.43Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "coursework",
+              "DocumentMoniker": "C:\\Users\\LENOVO\\Downloads\\application development\\week1\\coursework\\coursework\\coursework.csproj",
+              "RelativeDocumentMoniker": "coursework\\coursework.csproj",
+              "ToolTip": "C:\\Users\\LENOVO\\Downloads\\application development\\week1\\coursework\\coursework\\coursework.csproj",
+              "RelativeToolTip": "coursework\\coursework.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-04-07T14:46:17.242Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "PersonTests.cs",
+              "DocumentMoniker": "C:\\Users\\LENOVO\\Downloads\\application development\\week1\\coursework\\coursework\\PersonTests.cs",
+              "RelativeDocumentMoniker": "coursework\\PersonTests.cs",
+              "ToolTip": "C:\\Users\\LENOVO\\Downloads\\application development\\week1\\coursework\\coursework\\PersonTests.cs",
+              "RelativeToolTip": "coursework\\PersonTests.cs",
+              "ViewState": "AgIAACIAAAAAAAAAAAAWwC0AAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-30T14:33:05.636Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

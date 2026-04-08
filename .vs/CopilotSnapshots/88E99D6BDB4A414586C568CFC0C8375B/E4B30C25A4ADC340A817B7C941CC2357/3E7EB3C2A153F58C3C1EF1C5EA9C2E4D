@@ -1,0 +1,345 @@
+﻿using MySql.Data.MySqlClient;
+using System.Data.Common;
+using System.Windows.Forms;
+using System.Xml.Linq;
+
+namespace coursework
+{
+    public partial class Form1 : Form
+    {
+        
+        private System.Collections.Generic.List<Person> _peopleList = new System.Collections.Generic.List<Person>();
+        string connectionString = "server=localhost;port=3306;user=root;password=1234;database=new_schema;";
+        MySqlConnection myConnection;
+        public Form1()
+        {
+           
+            myConnection = new MySqlConnection(connectionString);
+            InitializeComponent();
+            
+           
+            comboBox1.Items.Clear();
+            comboBox1.Items.Add("All"); 
+            comboBox1.Items.Add("Teaching Staff");
+            comboBox1.Items.Add("Administration");
+            comboBox1.Items.Add("Students");
+            comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBox1.SelectedIndex = 0; 
+        }
+
+        private void btnAddNew_Click(object sender, EventArgs e)
+        {
+            AddPersonForm form = new AddPersonForm();
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                var data = form.GetInputData();
+                Person newPerson = null;
+
+               
+                string role = data.Role;
+                double salary = 0;
+                string[] parts = data.Info.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (parts.Length > 0 && double.TryParse(parts[0], out double s))
+                {
+                    salary = s;
+                }
+
+                string sub1 = parts.Length > 1 ? parts[1] : "";
+                string sub2 = parts.Length > 2 ? parts[2] : "";
+                string sub3 = parts.Length > 3 ? parts[3] : "";
+
+                if (role.ToLower() == "teaching staff" || role.ToLower() == "teacher")
+                    newPerson = new Teacher(0, data.Name, data.Tel, data.Email, salary, sub1, sub2);
+                else if (role.ToLower() == "administration" || role.ToLower() == "admin")
+                {
+                    string textLower = data.Info.ToLower();
+                    bool isFt = textLower.Contains("true") || textLower.Contains("full-time") || textLower.Contains("fulltime") || textLower.Contains("full time");
+                    int hrs = 0;
+                    string[] tempParts = data.Info.Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    for (int i = 1; i < tempParts.Length; i++)
+                    {
+                        if (int.TryParse(tempParts[i], out int h))
+                            hrs = h;
+                    }
+                    newPerson = new Admin(0, data.Name, data.Tel, data.Email, salary, isFt, hrs);
+                }
+                else
+                {
+                    sub1 = parts.Length > 0 ? parts[0] : "";
+                    sub2 = parts.Length > 1 ? parts[1] : "";
+                    sub3 = parts.Length > 2 ? parts[2] : "";
+                    newPerson = new Student(0, data.Name, data.Tel, data.Email, sub1, sub2, sub3);
+                }
+
+               
+                _peopleList.Add(newPerson);
+
+                SaveToDatabase(newPerson, salary, data.Info);
+                LoadDataFromDatabase();
+            }
+        }
+
+        private void SaveToDatabase(Person p, double salary, string info)
+        {
+            string connectionString = "server=localhost;port=3306;user=root;password=1234;database=new_schema;";
+            string query = "INSERT INTO Person (name, phone, email, role, salary, info) VALUES (@n, @p, @e, @r, @s, @i)";
+
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@n", p.Name);
+                    cmd.Parameters.AddWithValue("@p", p.Telephone);
+                    cmd.Parameters.AddWithValue("@e", p.Email);
+                    cmd.Parameters.AddWithValue("@r", p.Role);
+                    cmd.Parameters.AddWithValue("@s", salary);
+                    cmd.Parameters.AddWithValue("@i", info);
+
+                    cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Lỗi lưu Database: " + ex.Message);
+                }
+            }
+        }
+
+        private void btnEdit_Click(object sender, EventArgs e)
+        {
+            if (dataGridView1.CurrentRow == null|| dataGridView1.CurrentRow.IsNewRow) return; ;
+            
+            DataGridViewRow row = dataGridView1.CurrentRow;
+            int id = Convert.ToInt32(row.Cells[0].Value);
+            string name = row.Cells[1].Value?.ToString() ?? ""; // Name phải là cột 1
+            string tel = row.Cells[2].Value?.ToString() ?? "";  // Tel là cột 2
+            string email = row.Cells[3].Value?.ToString() ?? ""; // Email là cột 3
+            string role = row.Cells[4].Value?.ToString() ?? "";  // Role là cột 4
+            
+            string rawInfo = "";
+            var p = _peopleList.Find(x => x.Id == id);
+            if (p != null)
+            {
+                if (p is Teacher t) rawInfo = $"{t.Salary} {t.Subject1} {t.Subject2}";
+                else if (p is Admin a) rawInfo = $"{a.Salary} {(a.IsFullTime ? "Full-Time" : "Part-Time")} {a.WorkingHours}";
+                else if (p is Student s) rawInfo = $"{s.Subject1} {s.Subject2} {s.Subject3}";
+            }
+
+            EditPersonForm form = new EditPersonForm(name, tel, email, role, rawInfo);
+
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                var newData = form.GetInputData();
+
+                UpdateDatabase(id, newData.Name, newData.Tel, newData.Email, newData.Role, newData.Info);
+                
+                // Tải lại dữ liệu từ Database để đảm bảo làm mới nguyên vẹn dữ liệu
+                // Tránh gán tay thủ công (vì Cells[0] là ID bị ẩn, gán nhầm sẽ gây lệch cột)
+                LoadDataFromDatabase();
+            }
+        }
+        private void UpdateDatabase(int id, string name, string tel, string email, string role, string info)
+        {
+            // Lấy lương từ chuỗi info (nếu bạn để lương trong info)
+            double salary = 0;
+            string[] parts = info.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length > 0)
+            {
+                double.TryParse(parts[0], out salary);
+            }
+
+            string query = "UPDATE Person SET name=@n, phone=@p, email=@e, role=@r, salary=@s, info=@i WHERE id=@id";
+
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@n", name);
+                    cmd.Parameters.AddWithValue("@p", tel);
+                    cmd.Parameters.AddWithValue("@e", email);
+                    cmd.Parameters.AddWithValue("@r", role);
+                    cmd.Parameters.AddWithValue("@s", salary);
+                    cmd.Parameters.AddWithValue("@i", info);
+                    cmd.Parameters.AddWithValue("@id", id);
+
+                    cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Lỗi cập nhật Database: " + ex.Message);
+                }
+            }
+        }
+        private void LoadDataFromDatabase()
+        {
+            string connectionString = "server=localhost;port=3306;user=root;password=1234;database=new_schema;";
+            string query = "SELECT id,  name, phone, email, role, salary, info FROM Person";
+
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+                    MySqlDataReader reader = cmd.ExecuteReader();
+
+                    dataGridView1.Rows.Clear();
+
+
+                    _peopleList.Clear();
+
+                    while (reader.Read())
+                    {
+                        int id = Convert.ToInt32(reader["id"]);
+                        string name = reader["name"].ToString();
+                        string tel = reader["phone"].ToString();
+                        string email = reader["email"].ToString();
+                        string role = reader["role"].ToString();
+                        double salary = Convert.ToDouble(reader["salary"]);
+                        string rawInfo = reader["info"].ToString();
+
+                        string[] parts = rawInfo.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                        string sub1 = parts.Length > 1 ? parts[1] : "";
+                        string sub2 = parts.Length > 2 ? parts[2] : "";
+                        string sub3 = parts.Length > 3 ? parts[3] : "";
+
+                        // 1. Khôi phục Object vào List (để tính đa hình chạy đúng)
+                        Person p;
+                        if (role.ToLower() == "teaching staff" || role.ToLower() == "teacher") p = new Teacher(id, name, tel, email, salary, sub1, sub2);
+                        else if (role.ToLower() == "administration" || role.ToLower() == "admin") 
+                        {
+                            string textLower = rawInfo.ToLower();
+                            bool isFt = textLower.Contains("true") || textLower.Contains("full-time") || textLower.Contains("fulltime") || textLower.Contains("full time");
+                            int hrs = 0;
+                            string[] tempParts = rawInfo.Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
+                            for (int i = 1; i < tempParts.Length; i++)
+                            {
+                                if (int.TryParse(tempParts[i], out int h))
+                                    hrs = h;
+                            }
+                            p = new Admin(id, name, tel, email, salary, isFt, hrs);
+                        }
+                        else 
+                        {
+                            sub1 = parts.Length > 0 ? parts[0] : "";
+                            sub2 = parts.Length > 1 ? parts[1] : "";
+                            sub3 = parts.Length > 2 ? parts[2] : "";
+                            p = new Student(id, name, tel, email, sub1, sub2, sub3);
+                        }
+                        p.Id = id;
+                        _peopleList.Add(p);
+
+                        // Lấy hiển thị dựa trên hàm đúng
+                        string displayInfo = ""; 
+                        if (p is Teacher t) displayInfo = $"Salary: {t.Salary}, Subj: {t.Subject1}, {t.Subject2}";
+                        else if (p is Admin a) displayInfo = $"Salary: {a.Salary}, {(a.IsFullTime ? "Full-Time" : "Part-Time")}, Hrs: {a.WorkingHours}";
+                        else if (p is Student s) displayInfo = $"Subj: {s.Subject1}, {s.Subject2}, {s.Subject3}";
+
+                        // 2. Thêm dòng vào Grid
+                        dataGridView1.Rows.Add(id, name, tel, email, p.Role, displayInfo);
+                    }
+                    reader.Close();
+                    if (dataGridView1.Columns.Count > 0)
+                        dataGridView1.Columns[0].Visible = false;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Lỗi tải dữ liệu: " + ex.Message);
+                }
+            }
+        }
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            dataGridView1.AllowUserToAddRows = false;
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+            btnViewByRole.Click += btnViewByRole_Click;
+            btnView.Click += btnView_Click;
+            btnDelete.Click += btnDelete_Click;
+            LoadDataFromDatabase();
+        }
+
+       
+        private void btnViewByRole_Click(object sender, EventArgs e)
+        {
+            string selectedRole = comboBox1.Text;
+            
+       
+            dataGridView1.Rows.Clear();
+
+            // Hi?n th? l?i các dòng có Role t??ng ?ng t? Data Structure (List _peopleList)
+            foreach (var person in _peopleList)
+            {
+                bool isMatch = false;
+                if (selectedRole == "All") isMatch = true;
+                else if (selectedRole == "Teaching Staff" && person is Teacher) isMatch = true;
+                else if (selectedRole == "Administration" && person is Admin) isMatch = true;
+                else if (selectedRole == "Students" && person is Student) isMatch = true;
+                else if (person.Role.Equals(selectedRole, System.StringComparison.OrdinalIgnoreCase)) isMatch = true;
+
+                if (isMatch)
+                {
+                    string info = ""; // Get base info based on inherited class type
+                    if (person is Teacher t) info = $"Salary: {t.Salary}, Subj: {t.Subject1}, {t.Subject2}";
+                    else if (person is Admin a) info = $"Salary: {a.Salary}, {(a.IsFullTime ? "Full-Time" : "Part-Time")}, Hrs: {a.WorkingHours}";
+                    else if (person is Student s) info = $"Subj: {s.Subject1}, {s.Subject2}, {s.Subject3}";
+
+                    dataGridView1.Rows.Add(person.Id, person.Name, person.Telephone, person.Email, person.Role, info);
+                }
+            }
+        }
+
+        private void btnView_Click(object sender, EventArgs e)
+        {
+            comboBox1.SelectedIndex = 0; // Choose "All"
+            btnViewByRole_Click(sender, e); // Reload grid
+        }
+        private void DeleteFromDatabase(int id)
+        {
+            string query = "DELETE FROM Person WHERE id = @id";
+
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@id", id);
+
+                    int result = cmd.ExecuteNonQuery();
+                  
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Lỗi khi xóa trong Database: " + ex.Message);
+                }
+            }
+        }
+
+        private void btnDelete_Click(object sender, EventArgs e)
+        {
+            if (dataGridView1.CurrentRow == null) return;
+
+            DialogResult confirm = MessageBox.Show("Are you sure you want to delete this record?", "Delete Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (confirm == DialogResult.Yes)
+            {
+                int idToDelete = Convert.ToInt32(dataGridView1.CurrentRow.Cells[0].Value);
+                // 2. GỌI LỆNH XÓA TRONG DATABASE TRƯỚC
+                DeleteFromDatabase(idToDelete);
+                // Remove from underlying data list (_peopleList)
+                int rowIndex = dataGridView1.CurrentRow.Index;
+                if (rowIndex >= 0 && rowIndex < _peopleList.Count)
+                {
+                    _peopleList.RemoveAt(rowIndex);
+                }
+                dataGridView1.Rows.RemoveAt(rowIndex);
+
+            }
+        }
+        }
+    }
+

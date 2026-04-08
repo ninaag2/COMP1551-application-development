@@ -1,0 +1,57 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
+using System.Xml.Linq;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
+
+namespace coursework
+{
+    public partial class EditPersonForm : Form
+    {
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public string PersonNameValue { get; set; } = "";
+        
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public string TelephoneValue { get; set; } = "";
+        
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public string EmailValue { get; set; } = "";
+        
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public string RoleValue { get; set; } = "";
+        
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public string AdditionalInfoValue { get; set; } = "";
+
+        public EditPersonForm()
+        {
+            InitializeComponent();
+        }
+
+        private void EditPersonForm_Load(object sender, EventArgs e)
+        {
+
+            txtName.Text = PersonNameValue;
+            txtTelephone.Text = TelephoneValue;
+            txtEmail.Text = EmailValue;
+            comboRole.Text = RoleValue;
+            txtAdditional.Text = AdditionalInfoValue;
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            PersonNameValue = txtName.Text;
+            TelephoneValue = txtTelephone.Text;
+            EmailValue = txtEmail.Text;
+            RoleValue = comboRole.Text;
+            AdditionalInfoValue = txtAdditional.Text;
+
+            this.DialogResult = DialogResult.OK;
+            this.Close();
+        }
+    }
+}

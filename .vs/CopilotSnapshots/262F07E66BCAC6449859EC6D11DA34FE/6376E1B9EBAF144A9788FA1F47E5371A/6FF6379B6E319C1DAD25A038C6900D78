@@ -1,0 +1,36 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
+
+namespace coursework
+{
+    public partial class AddPersonForm : Form
+    {
+        public AddPersonForm()
+        {
+            InitializeComponent();
+            button2.Click += button2_Click;
+        }
+
+        public (string Name, string Tel, string Email, string Role, string Info) GetInputData()
+        {
+            return (
+                textBox1.Text,
+                textBox2.Text,
+                textBox3.Text,
+                comboBox1.Text,
+                textBox4.Text + " " + textBox5.Text
+            );
+        }
+
+        private void button2_Click(object? sender, EventArgs e)
+        {
+            this.DialogResult = DialogResult.OK;
+            this.Close();
+        }
+    }
+}

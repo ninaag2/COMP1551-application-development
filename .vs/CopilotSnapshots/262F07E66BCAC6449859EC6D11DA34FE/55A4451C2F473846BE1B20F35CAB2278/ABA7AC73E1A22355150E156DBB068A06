@@ -1,0 +1,187 @@
+﻿namespace coursework
+{
+    partial class EditPersonForm
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            button2 = new Button();
+            button1 = new Button();
+            comboRole = new ComboBox();
+            txtEmail = new TextBox();
+            txtTelephone = new TextBox();
+            txtName = new TextBox();
+            Role = new Label();
+            Email = new Label();
+            Telephone = new Label();
+            Name = new Label();
+            lbAI = new Label();
+            txtAdditional = new TextBox();
+            SuspendLayout();
+            // 
+            // button2
+            // 
+            button2.BackColor = SystemColors.ControlDark;
+            button2.Location = new Point(445, 379);
+            button2.Name = "button2";
+            button2.Size = new Size(94, 29);
+            button2.TabIndex = 27;
+            button2.Text = "save";
+            button2.UseVisualStyleBackColor = false;
+            button2.Click += button2_Click;
+            // 
+            // button1
+            // 
+            button1.BackColor = SystemColors.ControlDark;
+            button1.Location = new Point(578, 379);
+            button1.Name = "button1";
+            button1.Size = new Size(94, 29);
+            button1.TabIndex = 26;
+            button1.Text = "cancel";
+            button1.UseVisualStyleBackColor = false;
+            // 
+            // comboRole
+            // 
+            comboRole.FormattingEnabled = true;
+            comboRole.Location = new Point(280, 224);
+            comboRole.Name = "comboRole";
+            comboRole.Size = new Size(125, 28);
+            comboRole.TabIndex = 25;
+            // 
+            // txtEmail
+            // 
+            txtEmail.Location = new Point(280, 164);
+            txtEmail.Name = "txtEmail";
+            txtEmail.Size = new Size(125, 27);
+            txtEmail.TabIndex = 22;
+            // 
+            // txtTelephone
+            // 
+            txtTelephone.Location = new Point(280, 107);
+            txtTelephone.Name = "txtTelephone";
+            txtTelephone.Size = new Size(125, 27);
+            txtTelephone.TabIndex = 21;
+            // 
+            // txtName
+            // 
+            txtName.Location = new Point(280, 43);
+            txtName.Name = "txtName";
+            txtName.Size = new Size(125, 27);
+            txtName.TabIndex = 20;
+            // 
+            // Role
+            // 
+            Role.AutoSize = true;
+            Role.Location = new Point(150, 224);
+            Role.Name = "Role";
+            Role.Size = new Size(46, 20);
+            Role.TabIndex = 17;
+            Role.Text = "Role :";
+            // 
+            // Email
+            // 
+            Email.AutoSize = true;
+            Email.Location = new Point(150, 164);
+            Email.Name = "Email";
+            Email.Size = new Size(53, 20);
+            Email.TabIndex = 16;
+            Email.Text = "Email :";
+            // 
+            // Telephone
+            // 
+            Telephone.AutoSize = true;
+            Telephone.Location = new Point(128, 107);
+            Telephone.Name = "Telephone";
+            Telephone.Size = new Size(85, 20);
+            Telephone.TabIndex = 15;
+            Telephone.Text = "Telephone :";
+            // 
+            // Name
+            // 
+            Name.AutoSize = true;
+            Name.Location = new Point(150, 43);
+            Name.Name = "Name";
+            Name.Size = new Size(56, 20);
+            Name.TabIndex = 14;
+            Name.Text = "Name :";
+            // 
+            // lbAI
+            // 
+            lbAI.AutoSize = true;
+            lbAI.Location = new Point(38, 296);
+            lbAI.Name = "lbAI";
+            lbAI.RightToLeft = RightToLeft.Yes;
+            lbAI.Size = new Size(165, 20);
+            lbAI.TabIndex = 28;
+            lbAI.Text = "Additional Information ";
+            // 
+            // txtAdditional
+            // 
+            txtAdditional.Location = new Point(280, 296);
+            txtAdditional.Name = "txtAdditional";
+            txtAdditional.Size = new Size(125, 27);
+            txtAdditional.TabIndex = 29;
+            // 
+            // EditPersonForm
+            // 
+            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(684, 423);
+            Controls.Add(txtAdditional);
+            Controls.Add(lbAI);
+            Controls.Add(button2);
+            Controls.Add(button1);
+            Controls.Add(comboRole);
+            Controls.Add(txtEmail);
+            Controls.Add(txtTelephone);
+            Controls.Add(txtName);
+            Controls.Add(Role);
+            Controls.Add(Email);
+            Controls.Add(Telephone);
+            Controls.Add(Name);
+            this.Name = "EditPersonForm";
+            Text = "EditPersonForm";
+            Load += EditPersonForm_Load;
+            ResumeLayout(false);
+            PerformLayout();
+        }
+
+        #endregion
+
+        private Button button2;
+        private Button button1;
+        private ComboBox comboRole;
+        private TextBox txtEmail;
+        private TextBox txtTelephone;
+        private TextBox txtName;
+        private Label Role;
+        private Label Email;
+        private Label Telephone;
+        private Label Name;
+        private Label lbAI;
+        private TextBox txtAdditional;
+    }
+}

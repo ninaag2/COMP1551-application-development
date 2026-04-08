@@ -1,0 +1,185 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
+using System.Xml.Linq;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
+
+namespace coursework
+{
+    public partial class EditPersonForm : Form
+    {
+        public EditPersonForm()
+        {
+            InitializeComponent();
+            button1.Click += button1_Click;
+            
+            // Initialize options for Role Combobox
+            comboRole.Items.Clear();
+            comboRole.Items.Add("Teaching Staff");
+            comboRole.Items.Add("Administration");
+            comboRole.Items.Add("Students");
+            comboRole.DropDownStyle = ComboBoxStyle.DropDownList;
+            
+            comboRole.SelectedIndexChanged += ComboRole_SelectedIndexChanged;
+        }
+
+        private void ComboRole_SelectedIndexChanged(object? sender, EventArgs e)
+        {
+            string role = comboRole.Text;
+            if (role == "Teaching Staff" || role == "Teacher")
+            {
+                lbAI.Text = "Salary, Subjects(2):";
+            }
+            else if (role == "Administration" || role == "Admin")
+            {
+                lbAI.Text = "Sal, Status, Hrs:";
+            }
+            else if (role == "Students" || role == "Student")
+            {
+                lbAI.Text = "Subjects (3):";
+            }
+        }
+
+        public EditPersonForm(string name, string tel, string email, string role, string info) : this()
+        {
+            txtName.Text = name;
+            txtTelephone.Text = tel;
+            txtEmail.Text = email;
+            comboRole.Text = role;
+            txtAdditional.Text = info;
+        }
+
+        public (string Name, string Tel, string Email, string Role, string Info) GetInputData()
+        {
+            return (
+                txtName.Text,
+                txtTelephone.Text,
+                txtEmail.Text,
+                comboRole.Text,
+                txtAdditional.Text
+            );
+        }
+
+        private void EditPersonForm_Load(object sender, EventArgs e)
+        {
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtName.Text))
+            {
+                MessageBox.Show("Name cannot be empty!", "Validation Error");
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(txtTelephone.Text))
+            {
+                MessageBox.Show("Telephone cannot be empty!", "Validation Error");
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(txtEmail.Text))
+            {
+                MessageBox.Show("Email cannot be empty!", "Validation Error");
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(comboRole.Text))
+            {
+                MessageBox.Show("Role cannot be empty!", "Validation Error");
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(txtAdditional.Text))
+            {
+                MessageBox.Show("Additional Information (Salary/Subjects) cannot be empty!", "Validation Error");
+                return;
+            }
+
+            // Check that Name does not contain numbers
+            if (System.Text.RegularExpressions.Regex.IsMatch(txtName.Text, @"\d"))
+            {
+                MessageBox.Show("Name must not contain numbers!", "Validation Error");
+                return;
+            }
+
+            // Check that telephone contains only numbers
+            if (!System.Text.RegularExpressions.Regex.IsMatch(txtTelephone.Text, @"^\d+$"))
+            {
+                MessageBox.Show("Telephone must contain numbers only!", "Validation Error");
+                return;
+            }
+
+            // Check that telephone length does not exceed 11 digits
+            if (txtTelephone.Text.Length > 11)
+            {
+                MessageBox.Show("Telephone must not exceed 11 digits!", "Validation Error");
+                return;
+            }
+
+            // Check that Email contains @gmail.com
+            if (!txtEmail.Text.EndsWith("@gmail.com"))
+            {
+                MessageBox.Show("Email must end with @gmail.com!", "Validation Error");
+                return;
+            }
+
+            // Extract salary from txtAdditional (Since the Edit form combines them, we separate the first number part)
+            if (comboRole.Text == "Students" || comboRole.Text == "Student")
+            {
+                string[] subjects = txtAdditional.Text.Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
+                if (subjects.Length != 3)
+                {
+                    MessageBox.Show("Students must have exactly 3 subjects (separated by space/comma)!", "Validation Error");
+                    return;
+                }
+            }
+            else if (comboRole.Text == "Administration" || comboRole.Text == "Admin")
+            {
+                string[] adminInfo = txtAdditional.Text.Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
+                if (adminInfo.Length < 2)
+                {
+                    MessageBox.Show("Administration must provide Status (Full-time/Part-time) and Working Hours!", "Validation Error");
+                    return;
+                }
+                
+                string textLower = txtAdditional.Text.ToLower();
+                if (!textLower.Contains("true") && !textLower.Contains("false") && 
+                    !textLower.Contains("full-time") && !textLower.Contains("part-time") && 
+                    !textLower.Contains("fulltime") && !textLower.Contains("parttime") &&
+                    !textLower.Contains("full time") && !textLower.Contains("part time"))
+                {
+                    MessageBox.Show("Status must contain 'Full-Time' or 'Part-Time'!", "Validation Error");
+                    return;
+                }
+
+                bool hasHours = false;
+                foreach (var info in adminInfo)
+                {
+                    if (int.TryParse(info, out _))
+                    {
+                        hasHours = true;
+                        break;
+                    }
+                }
+
+                if (!hasHours)
+                {
+                    MessageBox.Show("Working hours must be a valid integer number!", "Validation Error");
+                    return;
+                }
+            }
+      
+            
+
+            this.DialogResult = DialogResult.OK;
+            this.Close();
+        }
+
+        private void button1_Click(object? sender, EventArgs e)
+        {
+            this.DialogResult = DialogResult.Cancel;
+            this.Close();
+        }
+    }
+}

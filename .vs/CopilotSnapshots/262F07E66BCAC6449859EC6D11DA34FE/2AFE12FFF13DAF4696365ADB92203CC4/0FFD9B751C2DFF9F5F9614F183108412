@@ -1,0 +1,37 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
+
+namespace coursework
+{
+    public partial class AddPersonForm : Form
+    {
+        public string PersonNameValue { get; set; } = "";
+        public string TelephoneValue { get; set; } = "";
+        public string EmailValue { get; set; } = "";
+        public string RoleValue { get; set; } = "";
+        public string AdditionalInfoValue { get; set; } = "";
+
+        public AddPersonForm()
+        {
+            InitializeComponent();
+            button2.Click += button2_Click;
+        }
+
+        private void button2_Click(object? sender, EventArgs e)
+        {
+            PersonNameValue = textBox1.Text;
+            TelephoneValue = textBox2.Text;
+            EmailValue = textBox3.Text;
+            RoleValue = comboBox1.Text;
+            AdditionalInfoValue = textBox4.Text + " " + textBox5.Text; // Assuming these are salary and subjects
+            
+            this.DialogResult = DialogResult.OK;
+            this.Close();
+        }
+    }
+}
